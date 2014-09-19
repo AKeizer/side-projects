@@ -1,5 +1,6 @@
 #!/usr/bin/python
 from gi.repository import Gtk, Gio
+import random
 
 class MyWindow(Gtk.Window):
 
@@ -25,12 +26,6 @@ class MyWindow(Gtk.Window):
         self.hb.pack_start(self.backbox)
 
         self.backbox.hide()
-
-        # button = Gtk.Button()
-        # icon = Gio.ThemedIcon(name="mail-send-receive-symbolic")
-        # image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-        # button.add(image)
-        # hb.pack_end(button)
 
         self.main_box = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = 7)
         ####################Main - Page##################################
@@ -72,9 +67,21 @@ class MyWindow(Gtk.Window):
         self.main_box.pack_start(self.first_box, True, True, 0)
         
         self.first_title_label = Gtk.Label()
-        self.first_title_label.set_markup("<big>Presenting Your Software Idea!</big>")
+        self.first_title_label.set_markup("<big><big>Presenting Your Software Idea!</big></big>")
         self.first_title_label.set_justify(Gtk.Justification.CENTER)
         self.first_box.pack_start(self.first_title_label, True, True, 0)
+
+        self.soft_idea_label = Gtk.Label()
+        self.soft_idea_label.set_justify(Gtk.Justification.CENTER)
+        self.first_box.pack_start(self.soft_idea_label, True, True, 0)
+
+        self.new_soft_idea_button = Gtk.Button("Give Me Another!")
+        self.new_soft_idea_button.connect("clicked", self.button_new_soft_idea)
+        self.first_box.pack_start(self.new_soft_idea_button, True, True, 0)
+
+        self.add_soft_idea_btn = Gtk.Button("Add ths idea to Your Favourites")
+        self.add_soft_idea_btn.connect("clicked", self.add_word_to_favourites)
+        self.first_box.pack_start(self.add_soft_idea_btn, True, True, 0)
 
         #####################END OF FIRST PAGE##########################
 
@@ -101,34 +108,53 @@ class MyWindow(Gtk.Window):
         self.backbox.show()
         self.first_box.show();
 
-    def on_button1_clicked(self, widget):
+    def button_new_soft_idea(self, widget):
+        self.roll_software_idea()
+
+    def roll_software_idea(self):
         f = open('list')
-        for word in f.read().split():
-            print(word)
-        #print("Hello")
+        listowords = f.read().split() 
         f.close()
+        rngVal = random.randint(0, len(listowords)-1)
+        # print(rngVal)
+        # print(listowords)
+        print("rolled a word")
+        self.ideaWord = listowords[rngVal]
+
+        
+        self.soft_idea_label.set_markup("<b><big>"+self.ideaWord+"</big></b>")
+        
+    def add_word_to_favourites(self, widget):
+        f = open('fav_ideas', 'a')
+        f.write(self.ideaWord+"\n")
+        f.close()
+
+    def on_button1_clicked(self, widget): #Software Idea from Main
         self.clear_main()
         self.current = "Software"
-        self.show_software();
+        self.roll_software_idea()
+        self.show_software()
 
-    def on_button2_clicked(self, widget):
+
+
+    def on_button2_clicked(self, widget): #book idea from main
         print("Goodbye")
         self.clear_main()
         self.current = "Book"
         
 
-    def on_button3_clicked(self, widget):
+    def on_button3_clicked(self, widget): #I dont need idea buttoin
         print("Goodbye")
         Gtk.main_quit()
 
-    def on_button4_clicked(self, widget):
+    def on_button4_clicked(self, widget): #show fav list button 
         f = open('fav_ideas')
         for word in f.readlines():
             print(word)
         f.close()
         self.current = "Fav_List"
 
-    def on_button5_clicked(self, widget):
+    def on_button5_clicked(self, widget): #write to fav list button 
         f = open('fav_ideas', 'a')
         f.write("Something, For now\n")
         f.close()
